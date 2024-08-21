@@ -1,48 +1,84 @@
 import type { MetaFunction } from "@remix-run/node";
+import {
+  ClientLoaderFunction,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
+import { EDGE_TYPES } from "~/components/query-builder/schema";
+import QueryBuilder from "~/components/query-builder";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Query Builder" },
+    { name: "description", content: "Rejuve.bio hypothesis generation" },
   ];
 };
 
-export default function Index() {
+export const clientLoader: ClientLoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const templateId = url.searchParams.get("template");
+  if (templateId) {
+    const response = await fetch(
+      `https://www.mock.com/annotation/templates/${templateId}`
+    );
+    const template = await response.json();
+    return { template };
+  }
+  return {};
+};
+
+export default () => {
+  const navigate = useNavigate();
+  const { template }: any = useLoaderData<typeof clientLoader>();
+
+  const runQuery = async (graph: any) => {
+    const requestJSON = {
+      requests: {
+        nodes: graph.nodes.map((n: any) => {
+          return {
+            node_id: n.id,
+            id: n.data.id || "",
+            type: n.data.type,
+            properties: Object.keys(n.data)
+              .filter((k) => k != "id" && k != "type" && n.data[k])
+              .reduce((acc, k) => ({ ...acc, [k]: n.data[k] }), {}),
+          };
+        }),
+        predicates: graph.edges.map((e: any) => {
+          return {
+            type: EDGE_TYPES.find((t) => t.label === e.data.edgeType)?.type,
+            source: e.source,
+            target: e.target,
+          };
+        }),
+      },
+    };
+
+    const response = await fetch("http://localhost:5000/query", {
+      method: "POST",
+      body: JSON.stringify(requestJSON),
+      headers: new Headers({ "content-type": "application/json" }),
+    });
+    const resultGraph = await response.json();
+    if (!resultGraph?.nodes?.length) {
+      return alert("No matching result for the query.");
+    }
+    navigate(`/annotation/${newAnnotationID}`);
+  };
+
   return (
-    <div className="font-sans p-4">
-      <h1 className="text-3xl">Welcome to Remix</h1>
-      <ul className="list-disc mt-4 pl-6 space-y-2">
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/quickstart"
-            rel="noreferrer"
-          >
-            5m Quick Start
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/tutorial"
-            rel="noreferrer"
-          >
-            30m Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/docs"
-            rel="noreferrer"
-          >
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+    <div className="h-full w-full">
+      <div className="flex h-screen flex-col">
+        <header className="border-b px-12 py-4">
+          <h1 className="text-xl font-medium">
+            
+            Query Builder
+          </h1>
+        </header>
+        <div className="relative flex-grow">
+          <QueryBuilder onSubmit={runQuery} graph={template?.query} />
+        </div>
+      </div>
     </div>
   );
-}
+};
