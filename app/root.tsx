@@ -12,11 +12,12 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { ThemeProvider } from "remix-themes";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { themeSessionResolver } from "./sessions.server";
+import "./global.scss";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   const API_URL = process.env.API_URL || "";
-  return json({ENV: {API_URL}, theme: getTheme()});
+  return json({ ENV: { API_URL }, theme: getTheme() });
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -30,9 +31,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ReactFlowProvider>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+          {children}
+          <ScrollRestoration />
+          <Scripts />
         </ReactFlowProvider>
       </body>
     </html>
@@ -44,7 +45,7 @@ export default function App() {
 
   return (
     <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
-        <Outlet />
+      <Outlet />
     </ThemeProvider>
-);
+  );
 }
