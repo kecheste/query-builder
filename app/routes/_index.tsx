@@ -2,7 +2,7 @@ import type { MetaFunction } from "@remix-run/node";
 import {
   ClientLoaderFunction,
   useLoaderData,
-  useNavigate,
+  // useNavigate,
 } from "@remix-run/react";
 import { EDGE_TYPES } from "~/components/query-builder/schema";
 import QueryBuilder from "~/components/query-builder";
@@ -19,7 +19,7 @@ export const clientLoader: ClientLoaderFunction = async ({ request }) => {
   const templateId = url.searchParams.get("template");
   if (templateId) {
     const response = await fetch(
-      `https://www.mock.com/annotation/templates/${templateId}`
+      `https://www.mock.com/annotation/templates/${templateId}`,
     );
     const template = await response.json();
     return { template };
@@ -27,8 +27,8 @@ export const clientLoader: ClientLoaderFunction = async ({ request }) => {
   return {};
 };
 
-export default () => {
-  const navigate = useNavigate();
+export default function Index(): JSX.Element {
+  // const navigate = useNavigate();
   const { template }: any = useLoaderData<typeof clientLoader>();
 
   const runQuery = async (graph: any) => {
@@ -63,17 +63,14 @@ export default () => {
     if (!resultGraph?.nodes?.length) {
       return alert("No matching result for the query.");
     }
-    navigate(`/annotation/${newAnnotationID}`);
+    // navigate(`/annotation/${newAnnotationID}`);
   };
 
   return (
     <div className="h-full w-full">
       <div className="flex h-screen flex-col">
         <header className="border-b px-12 py-4">
-          <h1 className="text-xl font-medium">
-            
-            Query Builder
-          </h1>
+          <h1 className="text-xl font-medium">Query Builder</h1>
         </header>
         <div className="relative flex-grow">
           <QueryBuilder onSubmit={runQuery} graph={template?.query} />
@@ -81,4 +78,4 @@ export default () => {
       </div>
     </div>
   );
-};
+}

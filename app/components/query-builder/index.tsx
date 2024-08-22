@@ -6,7 +6,7 @@ import { getAllEdgesForNodesTypes, getEdgebyType, NODE_SCHEMA } from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import CustomEdge from "./edge";
 import CustomNode from "./node";
-import '@xyflow/react/dist/style.css';
+
 import {
   Popover,
   PopoverContent,
