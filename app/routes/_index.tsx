@@ -14,6 +14,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+function  trialFunc(message:any){
+  const targetOrigin = "http://localhost:5173"
+  console.log('in trialFunc')
+  window.parent.postMessage(message, targetOrigin)
+}
+
 export const clientLoader: ClientLoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const templateId = url.searchParams.get("template");
@@ -63,7 +69,11 @@ export default () => {
     if (!resultGraph?.nodes?.length) {
       return alert("No matching result for the query.");
     }
-    navigate(`/annotation/${newAnnotationID}`);
+
+    trialFunc({
+      resultGraph
+    })
+    // navigate(`/annotation/${newAnnotationID}`);
   };
 
   return (
