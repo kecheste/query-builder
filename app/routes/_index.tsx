@@ -6,6 +6,7 @@ import {
 } from "@remix-run/react";
 import { EDGE_TYPES } from "~/components/query-builder/schema";
 import QueryBuilder from "~/components/query-builder";
+import postRobot from "post-robot"
 
 export const meta: MetaFunction = () => {
   return [
@@ -15,9 +16,32 @@ export const meta: MetaFunction = () => {
 };
 
 function  trialFunc(message:any){
-  const targetOrigin = "http://localhost:5173"
+  const targetOrigin = "http://127.0.0.1:8081/?tool_id=liftOver1&version=latest"
   console.log('in trialFunc')
-  window.parent.postMessage(message, targetOrigin)
+  console.log(message)
+  import("post-robot").then((postRobot) =>{
+
+    postRobot.send(targetOrigin, 'getUser', { id: 1337 })
+//     .then(function(event) {
+//       // var user = event.data;
+      
+//       // console.log(event.source, event.origin, 'Got user:', user);
+
+//       // Call the user.logout function from the other window!
+
+//       // user.logout();
+      
+// }).catch(function(err) {
+
+//     // Handle any errors that stopped our call from going through
+    
+//     console.error(err);
+//   });
+})
+  // window.postMessage(message, '*')
+  console.log(window)
+  console.log(window.top)
+  console.log(typeof(window.parent.postMessage))
 }
 
 export const clientLoader: ClientLoaderFunction = async ({ request }) => {
@@ -60,15 +84,16 @@ export default () => {
       },
     };
 
-    const response = await fetch("http://localhost:5000/query", {
-      method: "POST",
-      body: JSON.stringify(requestJSON),
-      headers: new Headers({ "content-type": "application/json" }),
-    });
-    const resultGraph = await response.json();
-    if (!resultGraph?.nodes?.length) {
-      return alert("No matching result for the query.");
-    }
+    // const response = await fetch("http://localhost:5000/query", {
+    //   method: "POST",
+    //   body: JSON.stringify(requestJSON),
+    //   headers: new Headers({ "content-type": "application/json" }),
+    // });
+    // const resultGraph = await response.json();
+    // if (!resultGraph?.nodes?.length) {
+    //   return alert("No matching result for the query.");
+    // }
+    const resultGraph = "resulting graph"
 
     trialFunc({
       resultGraph
