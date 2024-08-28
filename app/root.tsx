@@ -16,7 +16,14 @@ import { themeSessionResolver } from "./sessions.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   const API_URL = process.env.API_URL || "";
-  return json({ENV: {API_URL}, theme: getTheme()});
+  return json({
+    ENV: {API_URL}, 
+    theme: getTheme(),
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+  }
+  });
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
