@@ -6,7 +6,7 @@ import {
 } from "@remix-run/react";
 import { EDGE_TYPES } from "~/components/query-builder/schema";
 import QueryBuilder from "~/components/query-builder";
-import postRobot from "post-robot"
+// import postRobot from "post-robot"  #uninstall this package
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,32 +16,8 @@ export const meta: MetaFunction = () => {
 };
 
 function  trialFunc(message:any){
-  const targetOrigin = "http://127.0.0.1:8081/?tool_id=liftOver1&version=latest"
-  console.log('in trialFunc')
-  console.log(message)
-  import("post-robot").then((postRobot) =>{
-
-    postRobot.send(targetOrigin, 'getUser', { id: 1337 })
-//     .then(function(event) {
-//       // var user = event.data;
-      
-//       // console.log(event.source, event.origin, 'Got user:', user);
-
-//       // Call the user.logout function from the other window!
-
-//       // user.logout();
-      
-// }).catch(function(err) {
-
-//     // Handle any errors that stopped our call from going through
-    
-//     console.error(err);
-//   });
-})
-  // window.postMessage(message, '*')
-  console.log(window)
-  console.log(window.top)
-  console.log(typeof(window.parent.postMessage))
+  const targetOrigin = "http://127.0.0.1:8081"
+  window.parent.postMessage(message, targetOrigin)
 }
 
 export const clientLoader: ClientLoaderFunction = async ({ request }) => {
@@ -93,12 +69,54 @@ export default () => {
     // if (!resultGraph?.nodes?.length) {
     //   return alert("No matching result for the query.");
     // }
-    const resultGraph = "resulting graph"
+    const resultGraph = {
+      "nodes": [
+          {
+            "node_id": "n1",
+            "id": "",
+            "type": "gene",
+            "properties": {}
+          },
+          {
+            "node_id": "n2",
+            "id": "",
+            "type": "transcript",
+            "properties": {}
+          },
+          {
+            "node_id": "n3",
+            "id": "",
+            "type": "protein",
+              "properties": {
+              "protein_name": "MKKS"
+            }
+          },
+          {
+            "node_id": "n4",
+            "id": "",
+            "type": "protein",
+              "properties": {
+              "protein_name": "MKKS"
+            }
+          }
+        ],
+        "predicates": [
+          {
+            "type": "transcribed to",
+            "source": "n1",
+            "target": "n2"
+          },
+          {
+            "type": "translates to",
+            "source": "n2",
+            "target": "n3"
+          }
+        ]
+      }
 
     trialFunc({
       resultGraph
     })
-    // navigate(`/annotation/${newAnnotationID}`);
   };
 
   return (
